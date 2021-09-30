@@ -1,12 +1,24 @@
 // Require the framework and instantiate it
 const fastify = require("fastify")({ logger: true });
-
-let counter = 0;
+const {
+  createCounterSet,
+  createCounter,
+  getCounterSet,
+} = require("./services");
 
 // Declare a route
-fastify.get("/", async (request, reply) => {
-  counter++;
-  return { hello: counter };
+fastify.post("/counter-set", async (request, reply) => {
+  return createCounterSet();
+});
+
+fastify.post("/counter", async (request, reply) => {
+  const { counterSetId, counterId } = request.body;
+  createCounter({ counterSetId, counterId });
+  return null;
+});
+
+fastify.get("/counter-set", async (request, reply) => {
+  return getCounterSet(request.query.id) || null;
 });
 
 // Run the server!
