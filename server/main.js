@@ -6,6 +6,10 @@ const {
   getCounterSet,
 } = require("./services");
 
+fastify.register(require("fastify-cors"), {
+  origin: "*",
+});
+
 // Declare a route
 fastify.post("/counter-set", async (request, reply) => {
   return createCounterSet();
