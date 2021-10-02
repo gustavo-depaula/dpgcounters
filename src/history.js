@@ -41,15 +41,23 @@ export function makeHistory() {
         return target[prop];
       }
 
+      if (prop === "on") {
+        return (callback) => addObserver("*", callback);
+      }
+
       if (prop.startsWith("on")) {
         const func = prop.slice(2);
         return (callback) => addObserver(func, callback);
       }
 
       return (...args) => {
-        const callbacks = getObservers(prop);
         target[prop](...args);
-        callbacks.forEach((cb) => cb(...args));
+
+        const specificCallbacks = getObservers(prop);
+        specificCallbacks.forEach((cb) => cb(...args));
+
+        const universalCallbacks = getObservers("*");
+        universalCallbacks.forEach((cb) => cb(prop, ...args));
       };
     },
   });

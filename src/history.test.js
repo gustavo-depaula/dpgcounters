@@ -28,3 +28,34 @@ it("attach observers to underlying history functions", () => {
 
   expect(callback).toHaveBeenCalledTimes(1);
 });
+
+it("attach universal observer", () => {
+  jest.spyOn(window.history, "pushState").mockImplementation(() => jest.fn());
+  jest.spyOn(window.history, "back").mockImplementation(() => jest.fn());
+
+  const history = makeHistory();
+  const callback = jest.fn();
+
+  const stopObserving = history.on((...values) => callback(values));
+
+  const values = [{}, "title", "/url"];
+  history.pushState(...values);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledWith(["pushState", ...values]);
+
+  history.back();
+  expect(callback).toHaveBeenCalledTimes(2);
+  expect(callback).toHaveBeenCalledWith(["back"]);
+
+  stopObserving();
+
+  history.pushState(...values);
+  history.pushState(...values);
+  history.pushState(...values);
+
+  history.back();
+  history.back();
+  history.back();
+
+  expect(callback).toHaveBeenCalledTimes(2);
+});
