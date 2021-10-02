@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 /**
  * God help & forgive me,
  * I wanna build something
@@ -72,3 +74,19 @@ const history = makeHistory();
 window.addEventListener("popstate", () => history.hashChange(), false);
 window.addEventListener("hashchange", () => history.hashChange(), false);
 // hack end
+
+export function useHistory() {
+  const [, update] = useState({});
+
+  useEffect(() => {
+    return history.on(() => update({}));
+  }, [update]);
+
+  return history;
+}
+
+export function useLocation() {
+  useHistory();
+
+  return window.location;
+}
