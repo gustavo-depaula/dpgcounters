@@ -62,3 +62,13 @@ export function makeHistory() {
     },
   });
 }
+
+// Little hack to observe browser's back button
+Object.defineProperty(window.history, "hashChange", {
+  value: () => {},
+  writable: true,
+});
+const history = makeHistory();
+window.addEventListener("popstate", () => history.hashChange(), false);
+window.addEventListener("hashchange", () => history.hashChange(), false);
+// hack end
