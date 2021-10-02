@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useHistory, useLocation } from "./history";
 import "./App.css";
 
 function Counter({ counter, updateCounter }) {
@@ -62,17 +63,34 @@ function useCounterSet() {
 
 function App() {
   const { counters, updateCounter } = useCounterSet();
+  const history = useHistory();
+  const location = useLocation();
+  const route = location.pathname;
+  const isInInitialPage = route === "/";
 
   return (
     <div className="App container mx-auto">
       <h1 className="text-4xl mt-8 mb-32">dpgcounters</h1>
-      {counters.map((counter) => (
-        <Counter
-          key={counter.id}
-          counter={counter}
-          updateCounter={updateCounter}
-        ></Counter>
-      ))}
+
+      {isInInitialPage && (
+        <>
+          <button onClick={() => history.pushState({}, "Title", "/url")}>
+            change route
+          </button>
+        </>
+      )}
+
+      {!isInInitialPage && (
+        <>
+          {counters.map((counter) => (
+            <Counter
+              key={counter.id}
+              counter={counter}
+              updateCounter={updateCounter}
+            ></Counter>
+          ))}
+        </>
+      )}
     </div>
   );
 }
