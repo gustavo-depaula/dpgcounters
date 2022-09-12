@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHistory, useLocation } from "./history";
 import "./App.css";
 
@@ -19,45 +19,53 @@ function Counter({ counter, updateCounter }) {
   );
 }
 
-function useCounterSet() {
-  const [counterSet, setCounterSet] = useState({
-    id: "",
-    counters: [
-      {
-        id: "3434",
-        value: 0,
-        unsignedOperationsAcks: [],
-      },
-    ],
-  });
+function useMutatedCounterSet()
 
-  const [mutations, setMutations] = useState([]);
+function useCounterSet(id = null) {
+  const [status, setStatus] = useState("loading");
+  const [counterSet, setCounterSet] = useState();
 
-  const updateCounter = ({ type, counterId }) => {
-    setMutations((ms) => [...ms, { type, counterId, ack: "asdf" }]);
-  };
-
-  const countersById = {};
-  counterSet.counters.forEach((counter) => {
-    countersById[counter.id] = { ...counter };
-  });
-
-  mutations.forEach(({ type, counterId }) => {
-    if (type === "inc") {
-      countersById[counterId].value++;
+  useEffect(() => {
+    if (!id) {
+      fetch("http://localhost:4000/counter-set", {
+        method: "POST",
+        mode: "cors",
+      })
+        .then((data) => data.json())
+        .then((newCounterSet) => {
+          setCounterSet(newCounterSet);
+          setStatus("loaded");
+        });
     }
+  }, []);
 
-    if (type === "dec") {
-      countersById[counterId].value--;
-    }
-  });
+  // const [mutations, setMutations] = useState([]);
 
-  const counters = Object.values(countersById);
-  console.log({ mutations, countersById });
+  // const updateCounter = ({ type, counterId }) => {
+  //   setMutations((ms) => [...ms, { type, counterId, ack: "asdf" }]);
+  // };
+
+  // const countersById = {};
+  // counterSet.counters.forEach((counter) => {
+  //   countersById[counter.id] = { ...counter };
+  // });
+
+  // mutations.forEach(({ type, counterId }) => {
+  //   if (type === "inc") {
+  //     countersById[counterId].value++;
+  //   }
+
+  //   if (type === "dec") {
+  //     countersById[counterId].value--;
+  //   }
+  // });
+
+  // const counters = Object.values(countersById);
+  // console.log({ mutations, countersById });
 
   return {
-    counters,
-    updateCounter,
+    counters: [],
+    updateCounter: () => {},
   };
 }
 
